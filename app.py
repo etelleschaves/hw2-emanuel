@@ -9,8 +9,9 @@ import argparse
 import json
 import os
 import sys
+import time
 
-import google.generativeai as genai
+from google import genai
 
 
 SYSTEM_PROMPT = """\
@@ -29,16 +30,17 @@ Guidelines:
 """
 
 
-def generate_response(model, customer_message):
+def generate_response(client, model_name, customer_message):
     """Send a customer message to Gemini and return the drafted response."""
-    chat = model.start_chat()
-    response = chat.send_message(
-        f"Draft a support response for this customer message:\n\n{customer_message}"
+    response = client.models.generate_content(
+        model=model_name,
+        config={"system_instruction": SYSTEM_PROMPT},
+        contents=f"Draft a support response for this customer message:\n\n{customer_message}",
     )
     return response.text
 
 
-def run_eval(model, eval_path="eval_set.json"):
+def run_eval(client, model_name, eval_path="eval_set.json"):
     """Run the model against all evaluation cases and print results."""
     with open(eval_path) as f:
         eval_cases = json.load(f)
@@ -52,8 +54,9 @@ def run_eval(model, eval_path="eval_set.json"):
         print(f"EXPECTED: {case['expected'][:100]}...")
         print("-" * 60)
 
-        response = generate_response(model, case["input"])
+        response = generate_response(client, model_name, case["input"])
         print(f"OUTPUT:\n{response}")
+        time.sleep(15)  # avoid free-tier rate limit (5 req/min)
         results.append({
             "id": case["id"],
             "type": case["type"],
@@ -68,12 +71,12 @@ def run_eval(model, eval_path="eval_set.json"):
     print(f"\nResults saved to {output_path}")
 
 
-def run_single(model, message):
+def run_single(client, model_name, message):
     """Generate a single response and print it."""
     print("\n--- Customer Message ---")
     print(message)
     print("\n--- Draft Response ---")
-    response = generate_response(model, message)
+    response = generate_response(client, model_name, message)
     print(response)
 
 
@@ -81,8 +84,8 @@ def main():
     parser = argparse.ArgumentParser(description="Customer Support Response Drafter")
     parser.add_argument("--eval", action="store_true", help="Run against evaluation set")
     parser.add_argument("--input", type=str, help="Single customer message to respond to")
-    parser.add_argument("--model", type=str, default="gemini-2.0-flash",
-                        help="Gemini model to use (default: gemini-2.0-flash)")
+    parser.add_argument("--model", type=str, default="gemini-2.5-flash",
+                        help="Gemini model to use (default: gemini-2.5-flash)")
     args = parser.parse_args()
 
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -90,16 +93,12 @@ def main():
         print("Error: Set the GEMINI_API_KEY environment variable.")
         sys.exit(1)
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel(
-        model_name=args.model,
-        system_instruction=SYSTEM_PROMPT,
-    )
+    client = genai.Client(api_key=api_key)
 
     if args.eval:
-        run_eval(model)
+        run_eval(client, args.model)
     elif args.input:
-        run_single(model, args.input)
+        run_single(client, args.model, args.input)
     else:
         print("Usage:")
         print('  python app.py --input "Your customer message here"')
