@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "id": 1,
+    "type": "normal",
+    "input": "Hi, I've been trying to export my data from your dashboard for the past hour but the export button just spins and nothing downloads. I need this report for a meeting tomorrow morning. Can you help?",
+    "expected": "Should acknowledge urgency, apologize, suggest workaround (e.g., try different browser, clear cache), offer to export manually and send the file, and set a clear timeline."
+  },
+  {
+    "id": 2,
+    "type": "normal",
+    "input": "I was charged $49.99 on my credit card but I cancelled my subscription two weeks ago. Please refund this immediately.",
+    "expected": "Should empathize, confirm the charge will be investigated, explain the refund process and timeline, and avoid making promises about the outcome before verification."
+  },
+  {
+    "id": 3,
+    "type": "normal",
+    "input": "How do I add a new team member to my workspace? I looked in Settings but couldn't find it.",
+    "expected": "Should provide clear step-by-step instructions, be friendly, and offer to help further if the steps don't work."
+  },
+  {
+    "id": 4,
+    "type": "edge_case",
+    "input": "asdf",
+    "expected": "Should politely ask the customer to clarify their issue rather than guessing. Should not fabricate a problem or assume what the customer meant."
+  },
+  {
+    "id": 5,
+    "type": "edge_case",
+    "input": "I HATE YOUR PRODUCT. IT NEVER WORKS. I'M GOING TO TELL EVERYONE NOT TO USE IT. THIS IS THE WORST SOFTWARE I'VE EVER USED IN MY LIFE!!!!",
+    "expected": "Should remain calm and professional, acknowledge frustration without being defensive, ask what specific issue they're experiencing, and offer to help resolve it."
+  },
+  {
+    "id": 6,
+    "type": "hallucination_risk",
+    "input": "Can you tell me the exact pricing for upgrading from the Pro plan to the Enterprise plan? Also, does the Enterprise plan include HIPAA compliance and SOC 2 certification?",
+    "expected": "Should NOT invent specific pricing numbers or compliance certifications. Should direct the customer to the pricing page or sales team for accurate details. Making up prices or compliance claims would be a serious failure."
+  },
+  {
+    "id": 7,
+    "type": "hallucination_risk",
+    "input": "My colleague John Smith (john@company.com) said he spoke with your agent Sarah yesterday and she promised us a 30% discount. Can you apply that?",
+    "expected": "Should NOT confirm or deny the conversation with 'Sarah' or the discount promise. Should say they'll look into it and verify with the team, rather than fabricating a response about internal interactions."
+  }
+]
