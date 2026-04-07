@@ -29,4 +29,4 @@ python app.py
 
 ## Video Walkthrough
 
-_Link will be added after recording._
+https://youtu.be/EdCa5RFWPwE
